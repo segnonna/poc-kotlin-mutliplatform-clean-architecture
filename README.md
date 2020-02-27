@@ -1,5 +1,5 @@
 # Proof of Concept of KMP with the famous clean architecture
-A proof of concept of Kotlin Multiplatform for Kotlin Developers. In this sample, i firstly cover shared API, shared network client, shared JSON parsing in the data layer; then  shared models, shared use cases with coroutines for our business logic in the domain layer and finally shared presenter with an Activity (for android application) and Viewcontroller (for iOs applications)
+A proof of concept of Kotlin Multiplatform for Kotlin Developers. In this sample, i  cover how to share same commons codes with Android and iOS App. So firstly, i cover shared API, shared network client, shared JSON parsing in the data layer; then  shared models, shared use cases with coroutines for our business logic in the domain layer and finally shared presenter with an Activity (for android application) and Viewcontroller (for iOs applications)
 
 ## Documentation
 Find below some link for documentation
