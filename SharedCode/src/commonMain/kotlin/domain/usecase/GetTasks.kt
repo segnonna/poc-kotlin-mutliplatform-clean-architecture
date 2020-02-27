@@ -17,6 +17,7 @@ class GetTasks(private val taskApi: TasksApi) : UseCase<List<Task>, UseCase.None
             val tasks = taskApi.getAllTasks().toModels()
             Success(tasks)
         } catch (e: Exception) {
+            println(e)
             Failure(e)
         }
     }

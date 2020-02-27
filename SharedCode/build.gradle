@@ -1,0 +1,152 @@
+plugins {
+    id 'kotlin-multiplatform'
+    id "kotlinx-serialization" version "1.3.10"
+}
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    compileSdkVersion 29
+
+    defaultConfig {
+        applicationId "hos.houns.pockmp"
+        minSdkVersion 14
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    packagingOptions {
+        exclude 'META-INF/ktor-client-serialization.kotlin_module'
+        exclude 'META-INF/kotlinx-coroutines-core.kotlin_module'
+        exclude 'META-INF/ktor-client-json.kotlin_module'
+        exclude 'META-INF/kotlinx-serialization-runtime.kotlin_module'
+        exclude 'META-INF/ktor-client-core.kotlin_module'
+        exclude 'META-INF/ktor-io.kotlin_module'
+        exclude 'META-INF/ktor-http.kotlin_module'
+        exclude 'META-INF/ktor-*'
+    }
+
+    sourceSets {
+        main {
+            // per default MPP names the Android module "main" - not sure how to change this, so we need to tell
+            // Gradle where to find the Android code
+            manifest.srcFile 'src/androidMain/AndroidManifest.xml'
+            java.srcDirs = ['src/androidMain/java']
+            res.srcDirs = ['src/androidMain/res']
+        }
+    }
+}
+
+dependencies {
+    implementation "androidx.appcompat:appcompat:1.1.0"
+    implementation "androidx.recyclerview:recyclerview:1.1.0"
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation "androidx.cardview:cardview:1.0.0"
+
+    implementation "com.github.bumptech.glide:glide:4.9.0"
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.2.1'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.2.1'
+}
+
+kotlin {
+  /*  //select iOS target platform depending on the Xcode environment variables
+    val iOSTarget: (String, KotlinNativeTarget.() -> Unit) -> KotlinNativeTarget =
+        if (System.getenv("SDK_NAME")?.startsWith("iphoneos") == true)
+            ::iosArm64
+        else
+            ::iosX64
+
+    iOSTarget("ios") {
+        binaries {
+            framework {
+                baseName = "SharedCode"
+            }
+        }
+    }*/
+
+    android("android")
+
+    def serialization_version = "0.11.0"
+    def ktor_version = "1.3.0"
+    def coroutines_version = "1.3.3"
+
+
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation("org.jetbrains.kotlin:kotlin-stdlib-common")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:$serialization_version")
+                // HTTP
+                implementation("io.ktor:ktor-client-core:${ktor_version}")
+                implementation("io.ktor:ktor-client-json:${ktor_version}")
+                implementation("io.ktor:ktor-client-serialization:${ktor_version}")
+
+                // Coroutines
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:${ktor_version}")
+            }
+        }
+
+
+        androidMain{
+            dependencies {
+                implementation("org.jetbrains.kotlin:kotlin-stdlib")
+                implementation ("org.jetbrains.kotlinx:kotlinx-serialization-runtime:${serialization_version}")
+
+                // HTTP
+                implementation ("io.ktor:ktor-client-android:${ktor_version}")
+                implementation ("io.ktor:ktor-client-json-jvm:${ktor_version}")
+                implementation ("io.ktor:ktor-client-serialization-jvm:${ktor_version}")
+                implementation ("io.ktor:ktor-client-okhttp:${ktor_version}")
+                implementation ("com.squareup.okhttp3:logging-interceptor:3.14.1")
+
+                // Coroutines
+                implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:${coroutines_version}")
+            }
+        }
+
+        iosMain{
+            dependencies {
+                implementation ("org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:${serialization_version}")
+                // HTTP
+                implementation ("io.ktor:ktor-client-ios:${ktor_version}")
+                implementation ("io.ktor:ktor-client-json-native:${ktor_version}")
+                implementation ("io.ktor:ktor-client-serialization-iosx64:${ktor_version}")
+
+                // Coroutines
+                implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core-native:${coroutines_version}")
+            }
+        }
+    }
+
+
+}
+
+task copyFramework {
+    def buildType = project.findProperty("kotlin.build.type") ?: "DEBUG"
+    dependsOn "link${buildType.toLowerCase().capitalize()}FrameworkIos"
+
+    doLast {
+        def srcFile = kotlin.targets.ios.binaries.getFramework(buildType).outputFile
+        def targetDir = getProperty("configuration.build.dir")
+        copy {
+            from srcFile.parent
+            into targetDir
+            include 'greeting.framework/**'
+            include 'greeting.framework.dSYM'
+        }
+    }
+}

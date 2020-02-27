@@ -32,9 +32,7 @@ abstract class BasePresenter<T>(private val coroutineContext: CoroutineContext) 
     protected open fun onViewDetached() {}
 }
 
-class PresenterCoroutineScope(
-    context: CoroutineContext
-) : CoroutineScope {
+class PresenterCoroutineScope(context: CoroutineContext) : CoroutineScope {
 
     private var onViewDetachJob = Job()
     override val coroutineContext: CoroutineContext = context + onViewDetachJob

@@ -2,6 +2,7 @@ package hos.houns.pockmp.presentation.tasks
 
 import hos.houns.pockmp.domain.defaultDispatcher
 import hos.houns.pockmp.domain.model.Task
+import hos.houns.pockmp.domain.uiDispatcher
 import hos.houns.pockmp.domain.usecase.GetTasks
 import hos.houns.pockmp.domain.usecase.UseCase
 import hos.houns.pockmp.presentation.BasePresenter
@@ -30,7 +31,10 @@ class TAsksPresenter(
                 onSuccess = { view?.setTasks(it) },
                 onFailure = { view?.showTasksFailedToLoad() }
             )
-            view?.setLoadingVisible(false)
+            launch(uiDispatcher) {
+                view?.setLoadingVisible(false)
+            }
+
         }
     }
 }
