@@ -11,5 +11,5 @@ pluginManagement {
     }
 }
 enableFeaturePreview("GRADLE_METADATA")
-include ":SharedCode"
+include (":SharedCode")
 rootProject.name = "POC KMP"
